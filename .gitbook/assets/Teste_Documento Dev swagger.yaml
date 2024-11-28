@@ -1,0 +1,251 @@
+---
+swagger: "2.0"
+info:
+  description: "API de aquisição de entidades da Ramada."
+  version: "2024-11-27T20:12:17Z"
+  title: "Teste_Documento"
+host: "i3sg1dcul8.execute-api.us-east-1.amazonaws.com"
+basePath: "/Dev"
+tags:
+- name: "Categorias"
+  description: "Recurso relacionado a busca de categorias."
+- name: "ProductsGrade"
+  description: "Recurso que padroniza a entidade de produto para ser exibida em grade."
+- name: "Parametros"
+  description: "Recurso relacionado a busca de parâmetros."
+schemes:
+- "https"
+paths:
+  /Categorias:
+    get:
+      tags:
+      - "Categorias"
+      summary: "Adquire Categorias de Produto"
+      x-hideTryItPanel: false
+      description: "Retorna todas as categorias com sub-categorias de produtos da\
+        \ Ramada."
+      produces:
+      - "text/plain"
+      - "application/json"
+      responses:
+        "200":
+          description: "Categorias retornadas com sucesso"
+          schema:
+            $ref: "#/definitions/ResponseCategoriasBody"
+        "500":
+          description: "Erro de Servidor"
+          schema:
+            $ref: "#/definitions/ResponseErrorText"
+  /Parametros:
+    post:
+      tags:
+      - "Parametros"
+      summary: "Adquire um Parâmetro Específico"
+      description: "Retorna informações de um parâmetro especificado por seu nome."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "RequestParametrosBody"
+        required: true
+        schema:
+          $ref: "#/definitions/RequestParametrosBody"
+      responses:
+        "200":
+          description: "Parâmetro retornado com sucesso"
+          schema:
+            $ref: "#/definitions/ResponseParametrosBody"
+  /ProductsGrade:
+    get:
+      tags:
+      - "ProductsGrade"
+      summary: "Adquire Produtos Agrupados em Grade"
+      description: "Retorna produtos padronizados para exibição em grade."
+      produces:
+      - "text/plain"
+      - "application/json"
+      parameters:
+      - name: "taxajuro"
+        in: "query"
+        description: "Taxa de juros do tipo de negociação ativo pelo cliente. Sem\
+          \ o envio desse parâmetro, produtos retornaram com os impostos zerados."
+        required: false
+        type: "string"
+      - name: "codtab"
+        in: "query"
+        description: "Código da tabela de preços. Sem o envio desse parâmetro, produtos\
+          \ retornaram com preço e impostos zerados."
+        required: false
+        type: "string"
+      - name: "codparc"
+        in: "query"
+        description: "Código do parceiro. Verifica se o produto foi marcado como lembrete\
+          \ por esse parceiro."
+        required: false
+        type: "string"
+      - name: "tiptaxa"
+        in: "query"
+        description: "Tipo de taxa do tipo de negociação ativo pelo cliente. Sem o\
+          \ envio desse parâmetro, produtos retornaram com os impostos zerados."
+        required: false
+        type: "string"
+      - name: "pagina"
+        in: "query"
+        description: "Realiza paginação na resposta. Se deixado em branco, retorna\
+          \ o topo da paginação."
+        required: false
+        type: "string"
+      - name: "grupo"
+        in: "query"
+        description: "ID da categoria dos produtos a serem retornados."
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Produtos retornados com sucesso"
+          schema:
+            $ref: "#/definitions/ResponseProductsGradeBody"
+        "500":
+          description: "Erro no Servidor"
+          schema:
+            $ref: "#/definitions/ResponseErrorText"
+definitions:
+  RequestParametrosBody:
+    type: "object"
+    required:
+    - "parametro"
+    properties:
+      parametro:
+        type: "string"
+    title: "RequestParametrosBody"
+  ResponseParametrosBody:
+    type: "object"
+    properties:
+      success:
+        type: "boolean"
+      data:
+        $ref: "#/definitions/ResponseParametrosBodyData"
+    title: "ResponseParametrosBody"
+  ResponseCategoriasBodyItemSubCatItem:
+    type: "object"
+    properties:
+      Codgrupoprod:
+        type: "integer"
+      Descrgrupoprod:
+        type: "string"
+      CodgrupoPai:
+        type: "integer"
+      Imagem:
+        type: "string"
+      Cont_subCategorias:
+        type: "integer"
+  ProductModelEmbalagensItem:
+    type: "object"
+    properties:
+      Codvol:
+        type: "string"
+      Qtd:
+        type: "string"
+      Multiplicador:
+        type: "string"
+  ResponseCategoriasBody:
+    title: "ResponseCategoriasBody"
+    type: "array"
+    items:
+      $ref: "#/definitions/ResponseCategoriasBodyItem"
+  ResponseCategoriasBodyItem:
+    type: "object"
+    properties:
+      Codgrupoprod:
+        type: "integer"
+      Descrgrupoprod:
+        type: "string"
+      CodgrupoPai:
+        type: "integer"
+      Imagem:
+        type: "string"
+      SubCat:
+        type: "array"
+        items:
+          $ref: "#/definitions/ResponseCategoriasBodyItemSubCatItem"
+  ResponseErrorText:
+    type: "string"
+    title: "ResponseErrorText"
+  ResponseProductsGradeBody:
+    title: "ResponseProductsGradeBody"
+    type: "array"
+    items:
+      $ref: "#/definitions/ProductModel"
+  ResponseParametrosBodyData:
+    type: "object"
+    properties:
+      CodParametro:
+        type: "string"
+      Parametro:
+        type: "string"
+      Valor:
+        type: "string"
+  ProductModel:
+    type: "object"
+    properties:
+      Descrmarcarmd:
+        type: "string"
+      Codprod:
+        type: "string"
+      Codemp:
+        type: "integer"
+      Codmarcarmd:
+        type: "integer"
+      Destaque:
+        type: "boolean"
+      Codgrupoprod:
+        type: "integer"
+      Descrprod:
+        type: "string"
+      Descgrupoprod:
+        type: "string"
+      Compldesc:
+        type: "string"
+      Caracteristicas:
+        type: "string"
+      Agrupmin:
+        type: "integer"
+      Codvol:
+        type: "string"
+      Estoque:
+        type: "integer"
+      Ncm:
+        type: "string"
+      Referencia:
+        type: "string"
+      Refforn:
+        type: "string"
+      Altura:
+        type: "number"
+      Largura:
+        type: "number"
+      Espessura:
+        type: "number"
+      Shelflife:
+        type: "integer"
+      Promocao:
+        type: "boolean"
+      Queimaestoque:
+        type: "boolean"
+      Embalagens:
+        type: "array"
+        items:
+          $ref: "#/definitions/ProductModelEmbalagensItem"
+      Preco:
+        type: "string"
+      ProdutoST:
+        type: "string"
+      ProdutoIpi:
+        type: "string"
+      Lembrete:
+        type: "boolean"
+      Pesobruto:
+        type: "string"
+    title: "ProductModel"
